@@ -1,0 +1,1293 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>封面预览</title>
+<!-- Google Fonts：可靠加载 -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bad+Script&family=Bangers&family=Barrio&family=Noto+Sans+SC:wght@700;900&family=Noto+Serif+SC:wght@400;700;900&family=Sansita:wght@400;800;900&family=Sigmar&family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.min.js"></script>
+<script>
+// 修复字体导出：将 cross-origin Google Fonts <link> 转为 inline <style>
+// html-to-image 无法读取跨域 cssRules，必须是 same-origin inline style 才能导出正确字体
+(async function inlineFontCSS() {
+  const fontLinks = [...document.querySelectorAll('link[rel="stylesheet"][href*="fonts.googleapis.com"]')];
+  await Promise.all(fontLinks.map(async link => {
+    try {
+      const resp = await fetch(link.href);
+      const css = await resp.text();
+      const style = document.createElement('style');
+      style.textContent = css;
+      link.parentNode.insertBefore(style, link);
+      link.remove();
+    } catch(e) {
+      console.warn('[font-inline] 无法内联字体:', link.href, e);
+    }
+  }));
+})();
+</script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', 'Microsoft YaHei', sans-serif;
+  background: #e8e3db;
+  background-image: radial-gradient(circle, rgba(140,110,70,0.15) 1px, transparent 1px);
+  background-size: 22px 22px;
+  min-height: 100vh;
+  display: flex; flex-direction: column; align-items: center;
+  padding: 28px 16px 56px; gap: 12px;
+}
+
+/* ── 控制栏 ── */
+.controls { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+.tab-group {
+  display: flex; background: rgba(255,252,246,0.94); border-radius: 22px; padding: 3px;
+  box-shadow: 0 1px 0 rgba(255,250,240,0.8) inset, 0 2px 12px rgba(45,38,30,0.10);
+  border: 1px solid rgba(180,155,120,0.20); align-items: center;
+  backdrop-filter: blur(12px);
+}
+.tab-btn {
+  padding: 7px 15px; border: none; background: none; border-radius: 18px;
+  font-size: 13px; font-weight: 600; color: #8a7a6a; cursor: pointer; transition: all 0.18s; white-space: nowrap;
+}
+.tab-btn.active { background: #2d261e; color: #faf8f5; }
+.tab-btn:not(.active):hover { background: rgba(45,38,30,0.07); color: #4a3c2e; }
+.accent-dot {
+  width: 22px; height: 22px; border-radius: 50%; cursor: pointer; border: 2.5px solid transparent;
+  margin: 4px; transition: transform 0.18s, border-color 0.18s; flex-shrink: 0;
+}
+.accent-dot.active { border-color: #2d261e; transform: scale(1.2); }
+.ctrl-label { font-size: 11px; color: #a89070; font-weight: 600; padding: 0 4px 0 10px; white-space: nowrap; letter-spacing: 0.2px; }
+
+/* 主题色块 */
+.theme-sw {
+  width: 30px; height: 22px; border-radius: 6px; cursor: pointer; border: 2.5px solid transparent;
+  margin: 3px; transition: transform 0.18s, border-color 0.18s; flex-shrink: 0;
+}
+.theme-sw.active { border-color: #2d261e; transform: scale(1.12); }
+
+/* 排版图标按钮 */
+.layout-btn {
+  width: 34px; height: 28px; border: 1.5px solid rgba(140,110,70,0.20); background: none;
+  border-radius: 7px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: all 0.18s; margin: 3px; color: #a89070;
+}
+.layout-btn.active { background: #2d261e; border-color: #2d261e; color: #faf8f5; }
+.layout-btn svg { pointer-events: none; }
+
+/* ── 封面容器 ── */
+.cover-outer {
+  border-radius: 18px; overflow: hidden;
+  box-shadow: 0 2px 0 rgba(255,250,238,0.55), 0 16px 60px rgba(45,38,30,0.26), 0 4px 16px rgba(45,38,30,0.12);
+  transition: width 0.3s, height 0.3s; flex-shrink: 0;
+}
+.cover-outer.r-3-4 { width: 360px; height: 480px; }
+.cover-outer.r-1-1 { width: 480px; height: 480px; }
+.cover-outer.r-4-3 { width: 480px; height: 360px; }
+
+/* ══ STYLE A — 干货图文型 ══ */
+#styleA {
+  width: 100%; height: 100%; background: #FAFAFA;
+  border-left: 5px solid var(--accent, #E8541A);
+  display: flex; flex-direction: column; overflow: hidden;
+}
+.sA-banner {
+  width: 100%; height: 38%; flex-shrink: 0; position: relative;
+  background: #DCDCDC; cursor: pointer; overflow: hidden;
+}
+.sA-banner img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.sA-banner-ph {
+  position: absolute; inset: 0; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 6px; color: #bbb; font-size: 13px;
+}
+.sA-banner-ph .pi { font-size: 26px; }
+.sA-banner .hover-hint {
+  position: absolute; inset: 0; background: rgba(0,0,0,0.25);
+  display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s;
+}
+.sA-banner:hover .hover-hint { opacity: 1; }
+/* hover 遮罩不拦截鼠标事件，让 pan/zoom 的 mousedown 能到达 img */
+.sA-banner .hover-hint, .sBL-img .hover-ov { pointer-events: none; }
+.sA-banner .hover-hint span {
+  background: rgba(0,0,0,0.5); color: white; font-size: 12px; font-weight: 600;
+  padding: 5px 14px; border-radius: 20px;
+}
+.sA-content {
+  flex: 1; min-height: 0; padding: 16px 22px 20px;
+  display: flex; flex-direction: column; justify-content: center; gap: 10px;
+}
+.sA-brand { font-size: 11px; font-weight: 700; color: var(--accent, #E8541A); letter-spacing: 0.3px; display: flex; align-items: center; gap: 6px; white-space: nowrap; overflow: hidden; }
+.sA-title { font-size: 46px; font-weight: 900; color: #111; line-height: 1.05; letter-spacing: -2px; }
+.sA-title .accent { color: var(--accent, #E8541A); }
+.sA-divider { width: 32px; height: 3px; background: var(--accent, #E8541A); border-radius: 2px; }
+.sA-sub { font-size: 14px; font-weight: 500; color: #555; line-height: 1.6; }
+.sA-sub .accent { color: var(--accent, #E8541A); font-weight: 800; font-size: 16px; }
+
+/* ══ STYLE B — 图文卡片型 ══
+   5主题 × 4排版
+   主题通过 #styleB.theme-X 类控制背景和色彩变量
+   排版通过 .sB-layout.active 切换
+══════════════════════════════════════ */
+#styleB { width: 100%; height: 100%; position: relative; overflow: hidden; }
+
+/* ── 主题背景 ── */
+#styleB.theme-aurora {
+  background:
+    radial-gradient(circle at 96% 2%, rgba(255,228,196,0.92) 0%, transparent 35%),
+    radial-gradient(circle at 6% 98%, rgba(208,191,255,0.72) 0%, transparent 38%),
+    #FAFAFA;
+  --t:  #1A1A1A;  --ts: #888888;
+  --ta: var(--accent,#E8541A);  --tb: var(--accent,#E8541A);
+  --tag-bg: rgba(255,255,255,0.78); --tag-bd: rgba(0,0,0,0.08); --tag-c: var(--accent,#E8541A);
+  --img-sh: 0 8px 36px rgba(0,0,0,0.10), 0 2px 8px rgba(0,0,0,0.06); --img-r: 14px;
+  --div-bg: var(--accent,#E8541A);
+}
+#styleB.theme-mint {
+  background: #E3EEEC;
+  --t:  #1A2A27;  --ts: #7A8D89;
+  --ta: var(--accent,#097A6A);  --tb: var(--accent,#097A6A);
+  --tag-bg: rgba(255,255,255,0.62); --tag-bd: rgba(122,141,137,0.28); --tag-c: var(--accent,#5A7A74);
+  --img-sh: 0 6px 28px rgba(0,70,60,0.18); --img-r: 12px;
+  --div-bg: var(--accent,#097A6A);
+}
+#styleB.theme-dark {
+  background: linear-gradient(155deg, #1C1C24 0%, #141416 55%, #0F0F18 100%);
+  --t:  #EAEAF0;  --ts: rgba(234,234,240,0.52);
+  --ta: var(--accent-bright,#D8B4FE);  --tb: var(--accent-bright,#D8B4FE);
+  --tag-bg: rgba(181,138,246,0.13); --tag-bd: rgba(181,138,246,0.30); --tag-c: var(--accent-bright,#D8B4FE);
+  --img-sh: 0 12px 50px rgba(0,0,0,0.62), 0 0 60px rgba(181,138,246,0.10); --img-r: 14px;
+  --div-bg: var(--accent-bright,#B58AF6);
+}
+#styleB.theme-amber {
+  background: #FFFBEB;
+  --t:  #1E3A8A;  --ts: rgba(30,58,138,0.58);
+  --ta: var(--accent,#2563EB);  --tb: var(--accent,#1E3A8A);
+  --tag-bg: var(--accent,#1E3A8A); --tag-bd: transparent; --tag-c: #FFFBEB;
+  --img-sh: 5px 6px 0px var(--accent,#1E3A8A); --img-r: 4px;
+  --div-bg: var(--accent,#1E3A8A);
+}
+#styleB.theme-amber .sBL-title { letter-spacing: -1px; }
+#styleB.theme-amber .sBL-title .accent {
+  color: var(--ta); text-decoration: underline;
+  text-decoration-color: var(--ta); text-underline-offset: 5px;
+}
+#styleB.theme-neon {
+  background: radial-gradient(ellipse 130% 80% at 50% -10%, #141821 0%, #0b0d10 58%);
+  --t:  #e7eef7;  --ts: rgba(231,238,247,0.52);
+  --ta: var(--accent,#19f0c2);  --tb: var(--accent-bright,#ff4f7a);
+  --tag-bg: rgba(25,240,194,0.10); --tag-bd: rgba(25,240,194,0.28); --tag-c: var(--accent,#19f0c2);
+  --img-sh: 0 0 0 1px rgba(25,240,194,0.16), 0 15px 50px rgba(0,0,0,0.72), 0 4px 24px rgba(25,240,194,0.12);
+  --img-r: 14px;
+  --div-bg: var(--accent,#19f0c2);
+}
+#styleB.theme-neon .sBL-divider { background: linear-gradient(90deg,#19f0c2,#ff4f7a); }
+#styleB.theme-neon .sBL-sub strong { color: #ff4f7a; }
+
+/* ── 排版基础 ── */
+.sB-layout {
+  position: absolute; inset: 0; display: none;
+  overflow: hidden; background: transparent;
+}
+.sB-layout.active { display: flex; }
+
+/* ── 共용文字元素 ── */
+.sBL-tag {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--tag-bg, rgba(255,255,255,0.15));
+  border: 1px solid var(--tag-bd, rgba(255,255,255,0.25));
+  color: var(--tag-c, rgba(255,255,255,0.9));
+  font-size: 12px; font-weight: 600; padding: 5px 14px; border-radius: 20px;
+  width: fit-content; flex-shrink: 0; backdrop-filter: blur(6px);
+  white-space: nowrap; overflow: hidden;
+}
+.sBL-title {
+  font-size: 42px; font-weight: 900; color: var(--t, #fff);
+  line-height: 1.05; letter-spacing: -2px; flex-shrink: 0;
+}
+.sBL-title .accent { color: var(--ta, var(--accent-bright, #FFD166)); }
+.sBL-divider {
+  width: 28px; height: 4px; background: var(--div-bg, var(--accent,#E8541A));
+  border-radius: 2px; flex-shrink: 0;
+}
+.sBL-sub {
+  font-size: 13px; font-weight: 500; color: var(--ts, rgba(255,255,255,0.8));
+  line-height: 1.6; flex-shrink: 0;
+}
+.sBL-sub strong { color: var(--tb, var(--accent-bright,#FFD166)); font-weight: 800; font-size: 14px; }
+
+/* ── 图片区 ── */
+.sBL-img {
+  background: rgba(128,128,128,0.14);
+  border-radius: var(--img-r, 12px);
+  box-shadow: var(--img-sh, 0 6px 28px rgba(0,0,0,0.5));
+  cursor: pointer; overflow: hidden; position: relative; flex-shrink: 0;
+}
+.sBL-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.sBL-img-ph {
+  position: absolute; inset: 0; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 6px;
+  color: rgba(128,128,128,0.65); font-size: 12px;
+}
+.sBL-img-ph .pi { font-size: 22px; }
+.sBL-img .hover-ov {
+  position: absolute; inset: 0; background: rgba(0,0,0,0.18);
+  display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s;
+}
+.sBL-img:hover .hover-ov { opacity: 1; }
+.sBL-img .hover-ov span { background: rgba(0,0,0,0.5); color: white; font-size: 11px; padding: 4px 12px; border-radius: 14px; }
+
+/* ── 排版 1: 上文下图 ── */
+.sB-l1 { flex-direction: column; padding: 18px 22px 20px; gap: 10px; }
+.sB-l1 .sBL-img { flex: 1; min-height: 0; }
+
+/* ── 排版 2: 上图下文 ── */
+.sB-l2 { flex-direction: column; }
+.sB-l2 .sBL-img { height: 44%; flex-shrink: 0; border-radius: 0; box-shadow: none; }
+.sB-l2 .sB-l2-text {
+  flex: 1; padding: 14px 22px 18px;
+  display: flex; flex-direction: column; gap: 8px; justify-content: center;
+}
+
+/* ── 排版 3: 左文右图 ── */
+.sB-l3 { flex-direction: row; padding: 18px 16px; gap: 14px; align-items: center; }
+.sB-l3-text { flex: 1; display: flex; flex-direction: column; gap: 8px; min-width: 0; overflow: hidden; }
+.sB-l3 .sBL-title { font-size: 34px; }
+.sB-l3 > .sBL-img { width: 44%; align-self: stretch; }
+
+/* ── 排版 4: 立体展示 (3D perspective) ── */
+.sB-l4 { flex-direction: column; padding: 12px 18px 8px; gap: 8px; }
+.sB-l4-text { display: flex; flex-direction: column; gap: 8px; flex-shrink: 0; }
+.sB-l4-stage {
+  flex: 1; min-height: 0; display: flex;
+  align-items: center; justify-content: center;
+  perspective: 700px; overflow: hidden;
+}
+.sB-l4-stage .sBL-img {
+  width: 90%; height: 90%;
+  transform: rotateX(8deg) rotateY(-12deg) rotateZ(-1deg);
+  box-shadow: -14px 22px 52px rgba(0,0,0,0.42), var(--img-sh, 0 4px 16px rgba(0,0,0,0.2));
+  transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+  will-change: transform;
+}
+#styleB.theme-aurora .sB-l4-stage .sBL-img,
+#styleB.theme-mint   .sB-l4-stage .sBL-img {
+  box-shadow: -14px 22px 52px rgba(0,0,0,0.22), 0 4px 16px rgba(0,0,0,0.08);
+}
+
+/* ══ STYLE C — 人物出镜型 ══ */
+#styleC {
+  width: 100%; height: 100%; position: relative; overflow: hidden;
+  /* 默认 aurora 白背景（无图时显示） */
+  background:
+    radial-gradient(circle at 94% 4%,  rgba(255,228,196,0.95) 0%, transparent 40%),
+    radial-gradient(circle at 6%  94%, rgba(208,191,255,0.88) 0%, transparent 42%),
+    radial-gradient(circle at 50% 55%, rgba(255,248,245,0.55) 0%, transparent 60%),
+    #FAFAFA;
+}
+
+/* 模糊背景层（上传图片后显示在边缘） */
+.sC-bg-blur {
+  position: absolute; inset: 0; z-index: 0; display: none;
+  background-size: cover; background-position: center;
+  transform: scale(1.12);
+  filter: blur(24px) brightness(0.68) saturate(1.3);
+}
+
+/* 清晰背景层（radial mask，仅显示人物中心区域） */
+.sC-bg {
+  position: absolute; inset: 0; z-index: 1; display: none;
+  background-size: cover; background-position: center;
+  transform: scale(1.06);
+  -webkit-mask-image: radial-gradient(ellipse 64% 68% at 50% 80%, black 16%, transparent 66%);
+  mask-image:          radial-gradient(ellipse 64% 68% at 50% 80%, black 16%, transparent 66%);
+}
+
+/* Aurora 白色渐变遮罩（始终显示，80%透明度在外圈） */
+.sC-aurora-ov {
+  position: absolute; inset: 0; z-index: 2; pointer-events: none;
+  background:
+    radial-gradient(ellipse 110% 55% at 50% 0%,  rgba(255,248,240,0.82) 0%, transparent 60%),
+    radial-gradient(circle  at 96% 2%,            rgba(255,228,196,0.68) 0%, transparent 32%),
+    radial-gradient(circle  at 4%  93%,           rgba(208,191,255,0.60) 0%, transparent 36%),
+    radial-gradient(ellipse 90%  42% at 50% 102%, rgba(255,245,235,0.30) 0%, transparent 55%);
+  transition: background 0.4s;
+}
+/* 上传了背景图后：aurora 遮罩换成极轻的暗角，让图片透出来 */
+#styleC.has-bg .sC-aurora-ov {
+  background:
+    radial-gradient(ellipse 100% 100% at 50% 50%, transparent 38%, rgba(0,0,0,0.32) 100%);
+}
+
+/* 人物：居中，从底部向上占 3/4 */
+.sC-person {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 75%;
+  display: flex; align-items: flex-end; justify-content: center;
+  z-index: 4; cursor: pointer;
+}
+.sC-person img {
+  height: 100%; max-width: 88%;
+  object-fit: contain; object-position: bottom center;
+  filter: drop-shadow(0 -2px 18px rgba(255,210,60,0.18)) drop-shadow(0 6px 22px rgba(0,0,0,0.22));
+  transition: filter 0.3s;
+}
+/* 抠图描边模式：白色发光轮廓 */
+.sC-person.cutout-on img {
+  filter:
+    drop-shadow(0 0 22px rgba(255,255,255,0.92))
+    drop-shadow(0 0 10px rgba(255,255,255,0.65))
+    drop-shadow(0 6px 28px rgba(0,0,0,0.30));
+}
+.sC-person-ph {
+  position: absolute; inset: 0; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 8px;
+  color: rgba(80,55,30,0.42); font-size: 12px; font-weight: 500;
+  border: 2px dashed rgba(160,120,80,0.28); border-radius: 12px; margin: 10%;
+  pointer-events: none;
+}
+.sC-person-ph .pi { font-size: 28px; }
+.sC-person:hover .sC-person-ph { border-color: rgba(160,120,80,0.55); color: rgba(100,65,20,0.75); }
+
+/* 文字叠加层（z-index 高于人物，确保文字可读） */
+.sC-overlay {
+  position: absolute; inset: 0; z-index: 6; padding: 20px 18px;
+  display: flex; flex-direction: column; justify-content: space-between;
+  pointer-events: none;
+}
+.sC-super {
+  font-size: 13px; font-weight: 700; color: rgba(75,45,15,0.82);
+  margin-bottom: 6px; letter-spacing: 0.3px; white-space: nowrap; overflow: hidden;
+}
+.sC-main {
+  /* 字号通过 --sC-fs 变量控制；颜色通过 --sC-text-color 控制 */
+  font-size: calc(38px * var(--sC-fs, 1)); font-weight: 900;
+  color: var(--sC-text-color, #FFE500);
+  line-height: 1.05; letter-spacing: -1px;
+  -webkit-text-stroke: 3px var(--sC-stroke-color, #111); paint-order: stroke fill;
+  text-shadow: var(--sC-text-shadow, 0 2px 5px rgba(0,0,0,0.40));
+}
+.sC-middle { display: flex; flex-direction: column; gap: 8px; max-width: 72%; }
+.sC-kw {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(255,255,255,0.92); color: #222; font-size: 13px; font-weight: 700;
+  padding: 6px 14px; border-radius: 20px; width: fit-content; letter-spacing: 0.2px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  white-space: nowrap; overflow: hidden;
+}
+.sC-emoji {
+  position: absolute; z-index: 7; font-size: 46px; line-height: 1;
+  filter: drop-shadow(0 3px 8px rgba(0,0,0,0.30));
+  right: 18px; bottom: 140px; transform: rotate(-8deg);
+  cursor: move; user-select: none; -webkit-user-select: none;
+}
+.sC-bottom {}
+.sC-sub {
+  font-size: calc(17px * var(--sC-fs, 1)); font-weight: 700;
+  color: var(--sC-sub-color, rgba(55,30,5,0.88));
+  line-height: 1.55; max-width: 62%;
+}
+.sC-sub .accent { color: var(--accent, #E8541A); font-weight: 800; }
+
+/* 封面内控制按钮（导出时隐藏） */
+.sC-ctrl-btn {
+  position: absolute; z-index: 10;
+  padding: 5px 11px; background: rgba(255,255,255,0.76);
+  border: 1px solid rgba(0,0,0,0.10); backdrop-filter: blur(8px);
+  color: #555; font-size: 11px; font-weight: 600; border-radius: 12px; cursor: pointer;
+  transition: background 0.2s; white-space: nowrap;
+}
+.sC-ctrl-btn:hover { background: rgba(255,255,255,0.94); }
+.sC-ctrl-btn.active { background: #111; color: #fff; border-color: #111; }
+
+/* ── 底部 ── */
+.bottom-actions { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.export-btn {
+  padding: 13px 52px; background: #2d261e; color: #faf8f5; border: none;
+  border-radius: 30px; font-size: 15px; font-weight: 700; cursor: pointer; letter-spacing: 0.5px;
+  box-shadow: 0 1px 0 rgba(255,245,225,0.12) inset, 0 6px 28px rgba(45,38,30,0.30);
+  transition: opacity 0.2s, transform 0.15s, box-shadow 0.15s;
+}
+.export-btn:hover { opacity: 0.88; transform: translateY(-2px); box-shadow: 0 1px 0 rgba(255,245,225,0.12) inset, 0 10px 36px rgba(45,38,30,0.36); }
+.hint { font-size: 12px; color: #b0a090; line-height: 1.6; text-align: center; max-width: 520px; }
+#fileInput, #personInput, #bgInput, #dImgInput { display: none; }
+
+/* ── contenteditable 通用 ── */
+[contenteditable] { outline: none; caret-color: var(--accent, #E8541A); }
+[contenteditable]:focus {
+  box-shadow: inset 0 0 0 2px rgba(232,84,26,0.45); border-radius: 4px;
+  cursor: text;
+}
+/* Style C：overlay pointer-events=none，直接子区块 + 可编辑元素开放点击 */
+.sC-top, .sC-middle, .sC-bottom { pointer-events: auto; }
+.sC-overlay [contenteditable] { pointer-events: auto; cursor: text; }
+
+/* ── Style B img pan/zoom cursor ── */
+.sBL-img img[data-pan] { cursor: grab; user-select: none; -webkit-user-select: none; }
+/* ── Style C person pan/zoom cursor ── */
+.sC-person img[data-pan] { cursor: grab; user-select: none; -webkit-user-select: none; }
+
+/* 注：Smiley Sans / Alibaba PuHuiTi / DingTalk JinBuTi CDN 已失效，已移除 @font-face */
+
+/* ══ STYLE D — 全图出镜 ══ */
+#styleD {
+  width: 100%; height: 100%; position: relative; overflow: hidden;
+  background: linear-gradient(135deg, #1C1C24 0%, #2E1060 100%);
+}
+.sD-bg-wrap {
+  position: absolute; inset: 0; cursor: pointer; overflow: hidden; z-index: 1;
+}
+.sD-bg-wrap img {
+  position: absolute; width: 100%; height: 100%;
+  object-fit: cover; object-position: center; display: block;
+}
+.sD-bg-wrap img[data-pan] { cursor: grab; user-select: none; -webkit-user-select: none; }
+.sD-bg-ph {
+  position: absolute; inset: 0; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 8px;
+  color: rgba(255,255,255,0.45); font-size: 12px; font-weight: 500;
+  border: 2px dashed rgba(255,255,255,0.22); border-radius: 12px; margin: 12px;
+  pointer-events: none;
+}
+.sD-bg-ph .pi { font-size: 32px; }
+.sD-bg-wrap:hover .sD-bg-ph { border-color: rgba(255,255,255,0.45); color: rgba(255,255,255,0.7); }
+.sD-bg-wrap .hover-hint {
+  position: absolute; inset: 0; background: rgba(0,0,0,0.22);
+  display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s;
+  pointer-events: none;
+}
+.sD-bg-wrap:hover .hover-hint { opacity: 1; }
+.sD-bg-wrap .hover-hint span {
+  background: rgba(0,0,0,0.5); color: white; font-size: 12px; font-weight: 600;
+  padding: 5px 14px; border-radius: 20px;
+}
+.sD-gradient-ov { display: none; }
+.sD-emoji {
+  position: absolute; z-index: 7; font-size: 46px; line-height: 1;
+  filter: drop-shadow(0 3px 8px rgba(0,0,0,0.30));
+  right: 18px; bottom: 140px; transform: rotate(-8deg);
+  cursor: move; user-select: none; -webkit-user-select: none;
+}
+
+/* ── 标题字体 CSS 变量 ── */
+.sA-title  { font-family: var(--title-font, inherit); }
+.sBL-title { font-family: var(--title-font, inherit); }
+.sC-main   { font-family: var(--title-font, inherit); }
+
+/* ── 字体选择器 ── */
+.font-btn {
+  padding: 4px 11px; border: 1.5px solid rgba(0,0,0,0.12); background: #fff;
+  border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer;
+  white-space: nowrap; color: #333; flex-shrink: 0; line-height: 1.5;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+}
+.font-btn:hover { border-color: var(--accent, #E8541A); color: var(--accent, #E8541A); }
+.font-btn.active { background: #111; color: #fff; border-color: #111; }
+.font-sep { width: 1px; background: rgba(0,0,0,0.12); margin: 3px 2px; flex-shrink: 0; }
+#fontScroller { display: flex; gap: 4px; overflow-x: auto; padding: 2px 0 4px; }
+#fontScroller::-webkit-scrollbar { height: 3px; }
+#fontScroller::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.2); border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<input type="file" id="fileInput"   accept="image/*" onchange="handleMainUpload(this)">
+<input type="file" id="personInput" accept="image/*,image/png" onchange="handlePersonUpload(this)">
+<input type="file" id="bgInput"     accept="image/*" onchange="handleBgUpload(this)">
+<input type="file" id="dImgInput"   accept="image/*" onchange="handleDImgUpload(this)">
+
+<!-- 行1：风格 + 比例 -->
+<div class="controls">
+  <div class="tab-group" id="styleTabs">
+    <button class="tab-btn active" onclick="switchStyle('A',this)">干货图文</button>
+    <button class="tab-btn" onclick="switchStyle('B',this)">图文卡片</button>
+    <button class="tab-btn" onclick="switchStyle('C',this)">人物出镜</button>
+    <button class="tab-btn" onclick="switchStyle('D',this)">全图出镜</button>
+  </div>
+  <div class="tab-group" id="ratioTabs">
+    <button class="tab-btn active" onclick="switchRatio('3-4',this)">3:4</button>
+    <button class="tab-btn" onclick="switchRatio('1-1',this)">1:1</button>
+    <button class="tab-btn" onclick="switchRatio('4-3',this)">4:3</button>
+  </div>
+</div>
+
+<!-- 行2：强调色 -->
+<div class="controls">
+  <div class="tab-group" id="accentGroup">
+    <span class="ctrl-label">强调色</span>
+    <div class="accent-dot active" style="background:#E8541A" onclick="setAccent('#E8541A','#FFD166',this)"></div>
+    <div class="accent-dot" style="background:#2563EB" onclick="setAccent('#2563EB','#93C5FD',this)"></div>
+    <div class="accent-dot" style="background:#16A34A" onclick="setAccent('#16A34A','#86EFAC',this)"></div>
+    <div class="accent-dot" style="background:#9333EA" onclick="setAccent('#9333EA','#D8B4FE',this)"></div>
+    <div class="accent-dot" style="background:#FFD600" onclick="setAccent('#FFD600','#FFE500',this)"></div>
+  </div>
+</div>
+
+<!-- 行2b：字体选择（影响所有风格标题） -->
+<div class="controls">
+  <div class="tab-group" style="padding:3px 8px 3px 6px; overflow:hidden; max-width:calc(100vw - 32px);">
+    <span class="ctrl-label" style="flex-shrink:0">字体</span>
+    <div id="fontScroller">
+      <button class="font-btn active" onclick="setTitleFont('',this)">默认</button>
+      <!-- 中文 · Google Fonts (可靠) -->
+      <button class="font-btn" style="font-family:'Noto Serif SC',serif" onclick="setTitleFont('Noto Serif SC',this)">思源宋体</button>
+      <button class="font-btn" style="font-family:'Noto Sans SC',sans-serif" onclick="setTitleFont('Noto Sans SC',this)">思源黑体</button>
+      <button class="font-btn" style="font-family:'ZCOOL KuaiLe',cursive" onclick="setTitleFont('ZCOOL KuaiLe',this)">站酷快乐</button>
+      <!-- 分割线 -->
+      <div class="font-sep"></div>
+      <!-- 英文 · Google Fonts -->
+      <button class="font-btn" style="font-family:'Sansita',sans-serif;font-weight:900" onclick="setTitleFont('Sansita',this)">Sansita</button>
+      <button class="font-btn" style="font-family:'Barrio',cursive;font-weight:400" onclick="setTitleFont('Barrio',this)">Barrio</button>
+      <button class="font-btn" style="font-family:'Sigmar',cursive;font-weight:400" onclick="setTitleFont('Sigmar',this)">Sigmar</button>
+      <button class="font-btn" style="font-family:'Bad Script',cursive;font-weight:400" onclick="setTitleFont('Bad Script',this)">Bad Script</button>
+      <button class="font-btn" style="font-family:'Bangers',cursive;font-weight:400" onclick="setTitleFont('Bangers',this)">Bangers</button>
+    </div>
+  </div>
+</div>
+
+<!-- 行3：图文卡片专属控制（仅B显示） -->
+<div class="controls" id="bControls" style="display:none">
+  <!-- 排版选择 -->
+  <div class="tab-group">
+    <span class="ctrl-label">排版</span>
+    <button class="layout-btn active" id="lBtn1" onclick="switchBLayout('1',this)" title="上文下图">
+      <svg width="18" height="16" viewBox="0 0 18 16" fill="none">
+        <rect x="1" y="1" width="16" height="5" rx="1" fill="currentColor" opacity=".45"/>
+        <rect x="1" y="8" width="16" height="7" rx="1" fill="currentColor"/>
+      </svg>
+    </button>
+    <button class="layout-btn" id="lBtn2" onclick="switchBLayout('2',this)" title="上图下文">
+      <svg width="18" height="16" viewBox="0 0 18 16" fill="none">
+        <rect x="1" y="1" width="16" height="7" rx="1" fill="currentColor"/>
+        <rect x="1" y="10" width="16" height="5" rx="1" fill="currentColor" opacity=".45"/>
+      </svg>
+    </button>
+    <button class="layout-btn" id="lBtn4" onclick="switchBLayout('4',this)" title="立体展示">
+      <svg width="18" height="16" viewBox="0 0 18 16" fill="none">
+        <rect x="1" y="1" width="16" height="4" rx="1" fill="currentColor" opacity=".4"/>
+        <rect x="2.5" y="7" width="13" height="8" rx="1.5" fill="currentColor"
+          transform="skewX(-4) skewY(-2)"/>
+      </svg>
+    </button>
+  </div>
+  <!-- 主题选择 -->
+  <div class="tab-group" id="themeGroup">
+    <span class="ctrl-label">主题</span>
+    <div class="theme-sw active"
+      style="background:linear-gradient(135deg,#fff3e8 40%,#ede8ff)"
+      onclick="setBTheme('aurora',this)" title="极光白"></div>
+    <div class="theme-sw"
+      style="background:#D1E8E4"
+      onclick="setBTheme('mint',this)" title="薄荷绿"></div>
+    <div class="theme-sw"
+      style="background:linear-gradient(135deg,#1C1C24,#2E1060)"
+      onclick="setBTheme('dark',this)" title="深空紫"></div>
+    <div class="theme-sw"
+      style="background:linear-gradient(135deg,#FFFBEB,#DBEAFE)"
+      onclick="setBTheme('amber',this)" title="琥珀蓝"></div>
+    <div class="theme-sw"
+      style="background:linear-gradient(135deg,#0b0d10,#0a1a14)"
+      onclick="setBTheme('neon',this)" title="暗夜霓虹"></div>
+  </div>
+</div>
+
+<!-- 行3b：人物出镜字号 + 文字颜色 + 拖拽控制（仅C显示） -->
+<div class="controls" id="cControls" style="display:none">
+  <div class="tab-group">
+    <span class="ctrl-label">字号</span>
+    <button class="tab-btn" onclick="changeSCFont(-0.1)" style="padding:7px 12px">−</button>
+    <span id="sFsDisplay" style="font-size:13px;font-weight:700;color:#555;padding:0 4px;min-width:28px;text-align:center">1.0×</span>
+    <button class="tab-btn" onclick="changeSCFont(+0.1)" style="padding:7px 12px">+</button>
+  </div>
+  <div class="tab-group" id="cTextColors">
+    <span class="ctrl-label">标题色</span>
+    <div class="accent-dot active" style="background:#FFE500;border:2px solid #333" onclick="setSCTextColor('#FFE500',this)"></div>
+    <div class="accent-dot" style="background:#FFFFFF;border:1.5px solid #ccc" onclick="setSCTextColor('#FFFFFF',this)"></div>
+    <div class="accent-dot" style="background:#111111" onclick="setSCTextColor('#111111',this)"></div>
+    <div class="accent-dot" style="background:#FF6B6B" onclick="setSCTextColor('#FF6B6B',this)"></div>
+    <div class="accent-dot" style="background:#60EFFF" onclick="setSCTextColor('#60EFFF',this)"></div>
+  </div>
+  <div class="tab-group" id="cSubColors">
+    <span class="ctrl-label">副标题色</span>
+    <div class="accent-dot active" style="background:rgba(55,30,5,0.88)" onclick="setSCSubColor('rgba(55,30,5,0.88)',this)" title="默认棕色"></div>
+    <div class="accent-dot" style="background:#FFFFFF;border:1.5px solid #ccc" onclick="setSCSubColor('#FFFFFF',this)" title="白色"></div>
+    <div class="accent-dot" style="background:#111111" onclick="setSCSubColor('#111111',this)" title="黑色"></div>
+    <div class="accent-dot" style="background:#FFE500;border:1.5px solid #aaa" onclick="setSCSubColor('#FFE500',this)" title="黄色"></div>
+  </div>
+  <div class="tab-group">
+    <button class="tab-btn" id="dragModeBtn" onclick="toggleSCDragMode()" style="padding:7px 14px">拖拽文字</button>
+  </div>
+  <div class="tab-group">
+    <button class="tab-btn active" id="toggleBadgeBtn" onclick="toggleSCElement('badge')" style="padding:7px 14px">🏷 badge</button>
+    <button class="tab-btn active" id="toggleKwBtn"    onclick="toggleSCElement('kw')"    style="padding:7px 14px">✅ 关键词</button>
+  </div>
+</div>
+
+<!-- 封面 -->
+<div class="cover-outer r-3-4" id="coverOuter">
+
+  <!-- ══ A 干货图文 ══ -->
+  <div id="styleA">
+    <!-- sABanner onclick 仍保留：无拖动时点击触发文件选择；有拖动时由 makePannable 阻止 onclick -->
+    <div class="sA-banner" id="sABanner" onclick="document.getElementById('fileInput').click()">
+      <img id="sAImg" alt="" style="display:none">
+      <div class="sA-banner-ph" id="sAPlaceholder">
+        <span class="pi">🖼️</span><span>点击上传封面图片</span>
+      </div>
+      <div class="hover-hint"><span>更换图片</span></div>
+    </div>
+    <div class="sA-content">
+      <div class="sA-brand" contenteditable="true" spellcheck="false">🎬 效率工具 · 自媒体神器</div>
+      <div class="sA-title" contenteditable="true" spellcheck="false">小红书封面<span class="accent">skill</span></div>
+      <div class="sA-divider"></div>
+      <div class="sA-sub" contenteditable="true" spellcheck="false">自动提取文案信息，生成封面</div>
+    </div>
+  </div>
+
+  <!-- ══ B 图文卡片（5主题 × 4排版） ══ -->
+  <div id="styleB" class="theme-aurora" style="display:none">
+
+    <!-- 排版1: 上文下图 -->
+    <div class="sB-layout sB-l1 active" id="sBL1">
+      <div class="sBL-tag" contenteditable="true" spellcheck="false">🎬 效率工具 · 自媒体神器</div>
+      <div class="sBL-title" contenteditable="true" spellcheck="false">小红书封面<span class="accent">skill</span></div>
+      <div class="sBL-divider"></div>
+      <div class="sBL-sub" contenteditable="true" spellcheck="false">自动提取文案信息，生成封面</div>
+      <div class="sBL-img" onclick="document.getElementById('fileInput').click()">
+        <img id="sBImg1El" alt="" style="display:none">
+        <div class="sBL-img-ph" id="sBImg1Ph"><span class="pi">🖼️</span><span>点击上传截图 / 图片</span></div>
+        <div class="hover-ov"><span>更换图片</span></div>
+      </div>
+    </div>
+
+    <!-- 排版2: 上图下文 -->
+    <div class="sB-layout sB-l2" id="sBL2">
+      <div class="sBL-img" onclick="document.getElementById('fileInput').click()">
+        <img id="sBImg2El" alt="" style="display:none">
+        <div class="sBL-img-ph" id="sBImg2Ph"><span class="pi">🖼️</span><span>点击上传截图 / 图片</span></div>
+        <div class="hover-ov"><span>更换图片</span></div>
+      </div>
+      <div class="sB-l2-text">
+        <div class="sBL-tag" contenteditable="true" spellcheck="false">🎬 效率工具 · 自媒体神器</div>
+        <div class="sBL-title" contenteditable="true" spellcheck="false">小红书封面<span class="accent">skill</span></div>
+        <div class="sBL-divider"></div>
+        <div class="sBL-sub" contenteditable="true" spellcheck="false">自动提取文案信息，生成封面</div>
+      </div>
+    </div>
+
+    <!-- 排版3: 左文右图 -->
+    <div class="sB-layout sB-l3" id="sBL3">
+      <div class="sB-l3-text">
+        <div class="sBL-tag" contenteditable="true" spellcheck="false">🎬 效率工具 · 自媒体神器</div>
+        <div class="sBL-title" contenteditable="true" spellcheck="false">小红书封面<span class="accent">skill</span></div>
+        <div class="sBL-divider"></div>
+        <div class="sBL-sub" contenteditable="true" spellcheck="false">自动提取文案信息，生成封面</div>
+      </div>
+      <div class="sBL-img" onclick="document.getElementById('fileInput').click()">
+        <img id="sBImg3El" alt="" style="display:none">
+        <div class="sBL-img-ph" id="sBImg3Ph"><span class="pi">🖼️</span><span>上传图片</span></div>
+        <div class="hover-ov"><span>更换</span></div>
+      </div>
+    </div>
+
+    <!-- 排版4: 立体展示 (3D tilt) -->
+    <div class="sB-layout sB-l4" id="sBL4">
+      <div class="sB-l4-text">
+        <div class="sBL-tag" contenteditable="true" spellcheck="false">🎬 效率工具 · 自媒体神器</div>
+        <div class="sBL-title" contenteditable="true" spellcheck="false">小红书封面<span class="accent">skill</span></div>
+        <div class="sBL-sub" contenteditable="true" spellcheck="false" style="margin-top:4px">自动提取文案信息，生成封面</div>
+      </div>
+      <div class="sB-l4-stage" id="sBStage4">
+        <div class="sBL-img" id="sBImg4Zone" onclick="document.getElementById('fileInput').click()">
+          <img id="sBImg4El" alt="" style="display:none">
+          <div class="sBL-img-ph" id="sBImg4Ph"><span class="pi">🖼️</span><span>点击上传截图 / 图片</span></div>
+          <div class="hover-ov"><span>更换图片</span></div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /styleB -->
+
+  <!-- ══ C 人物出镜 ══ -->
+  <div id="styleC" style="display:none">
+    <!-- 三层背景：模糊层 + 清晰层(radial mask) + aurora 遮罩 -->
+    <div class="sC-bg-blur" id="sCBgBlur"></div>
+    <div class="sC-bg"      id="sCBg"></div>
+    <div class="sC-aurora-ov"></div>
+
+    <!-- 人物（居中，底部向上3/4） -->
+    <div class="sC-person" id="sCPerson" onclick="document.getElementById('personInput').click()">
+      <img id="sCPersonImg" alt="" style="display:none">
+      <div class="sC-person-ph" id="sCPersonPh">
+        <span class="pi">👤</span><span>点击上传人物照片</span>
+      </div>
+    </div>
+
+    <div class="sC-emoji">🤩</div>
+
+    <!-- 文字叠加 -->
+    <div class="sC-overlay" id="sCOverlay">
+      <div class="sC-top">
+        <div class="sC-super" contenteditable="true" spellcheck="false">🎬 效率工具 · 自媒体神器</div>
+        <div class="sC-main" contenteditable="true" spellcheck="false">小红书封面<br>skill</div>
+      </div>
+      <!-- 中间标签区（参考小红书博主封面风格） -->
+      <div class="sC-middle">
+        <div class="sC-kw" contenteditable="true" spellcheck="false">✅ 1分钟搞定</div>
+        <div class="sC-kw" contenteditable="true" spellcheck="false">✅ 15+风格可选</div>
+        <div class="sC-kw" contenteditable="true" spellcheck="false">✅ 一键导出</div>
+      </div>
+      <div class="sC-bottom">
+        <div class="sC-sub" contenteditable="true" spellcheck="false">自动提取文案信息，生成封面</div>
+      </div>
+    </div>
+
+    <!-- 封面内控制按钮（导出时隐藏） -->
+    <button class="sC-ctrl-btn no-export" id="cutoutToggle"
+      onclick="toggleCutout()" style="bottom:10px; right:10px">描边 OFF</button>
+    <button class="sC-ctrl-btn no-export"
+      onclick="document.getElementById('bgInput').click()" style="top:10px; right:10px">上传背景图</button>
+  </div>
+
+  <!-- ══ D 全图出镜 ══ -->
+  <div id="styleD" style="display:none">
+    <!-- 全图背景（点击上传，支持 pan/zoom） -->
+    <div class="sD-bg-wrap" id="sDImgWrap" onclick="document.getElementById('dImgInput').click()">
+      <img id="sDImg" alt="" style="display:none">
+      <div class="sD-bg-ph" id="sDPlaceholder">
+        <span class="pi">🖼️</span><span>点击上传全图背景</span>
+      </div>
+      <div class="hover-hint"><span>更换图片</span></div>
+    </div>
+
+    <!-- 渐变遮罩，提升文字可读性 -->
+
+    <div class="sD-emoji">🤩</div>
+
+    <!-- 文字叠加（与 Style C 相同 CSS） -->
+    <div class="sC-overlay" id="sDOverlay">
+      <div class="sC-top">
+        <div class="sC-super" contenteditable="true" spellcheck="false">🎬 效率工具 · 自媒体神器</div>
+        <div class="sC-main" contenteditable="true" spellcheck="false">小红书封面<br>skill</div>
+      </div>
+      <div class="sC-middle">
+        <div class="sC-kw" contenteditable="true" spellcheck="false">✅ 1分钟搞定</div>
+        <div class="sC-kw" contenteditable="true" spellcheck="false">✅ 15+风格可选</div>
+        <div class="sC-kw" contenteditable="true" spellcheck="false">✅ 一键导出</div>
+      </div>
+      <div class="sC-bottom">
+        <div class="sC-sub" contenteditable="true" spellcheck="false">自动提取文案信息，生成封面</div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /coverOuter -->
+
+<!-- 底部 -->
+<div class="bottom-actions">
+  <button class="export-btn" onclick="exportPNG()">导出封面 PNG</button>
+  <span class="hint">干货图文/图文卡片：点图片区上传 · 人物出镜：点人物区上传照片 · 全图出镜：点封面上传背景图（可拖拽/滚轮缩放）</span>
+</div>
+
+<script>
+let currentStyle = 'A';
+let mainUrl = null;
+let personUrl = null;
+let bgUrl = null;
+let cutoutOn = false;
+let currentBLayout = '1';
+let scDragMode = false;
+
+const root = document.documentElement;
+
+// ── emoji 拖拽（通用，C 和 D 均支持） ──
+function initEmojiDragFor(emojiEl, containerEl) {
+  if (!emojiEl || !containerEl) return;
+  let dn = false, ox = 0, oy = 0;
+  emojiEl.addEventListener('mousedown', e => {
+    if (e.button !== 0) return;
+    e.preventDefault(); e.stopPropagation();
+    const scr = containerEl.getBoundingClientRect();
+    const er  = emojiEl.getBoundingClientRect();
+    if (!emojiEl.dataset.dragged) {
+      emojiEl.dataset.dragged = '1';
+      emojiEl.style.right  = 'auto';
+      emojiEl.style.bottom = 'auto';
+      emojiEl.style.left   = (er.left - scr.left) + 'px';
+      emojiEl.style.top    = (er.top  - scr.top)  + 'px';
+    }
+    ox = e.clientX - parseFloat(emojiEl.style.left);
+    oy = e.clientY - parseFloat(emojiEl.style.top);
+    dn = true;
+  });
+  document.addEventListener('mousemove', e => {
+    if (!dn) return;
+    emojiEl.style.left = (e.clientX - ox) + 'px';
+    emojiEl.style.top  = (e.clientY - oy) + 'px';
+  });
+  document.addEventListener('mouseup', () => { dn = false; });
+}
+initEmojiDragFor(document.querySelector('#styleC .sC-emoji'), document.getElementById('styleC'));
+initEmojiDragFor(document.querySelector('#styleD .sD-emoji'), document.getElementById('styleD'));
+
+// ── 初始化 CSS 变量 ──
+root.style.setProperty('--accent', '#E8541A');
+root.style.setProperty('--accent-bright', '#FFD166');
+root.style.setProperty('--sC-text-color', '#FFE500');
+root.style.setProperty('--sC-stroke-color', '#111111');  // 默认深色描边
+root.style.setProperty('--sC-text-shadow', '2px 3px 0px #000000');  // 默认硬投影 distance~4 angle-50°
+root.style.setProperty('--sC-sub-color', 'rgba(55,30,5,0.88)');
+
+// ── 强调色 ──
+function setAccent(color, brightColor, el) {
+  root.style.setProperty('--accent', color);
+  root.style.setProperty('--accent-bright', brightColor);
+  document.querySelectorAll('#accentGroup .accent-dot').forEach(d => d.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// ── 风格切换 ──
+function switchStyle(s, btn) {
+  currentStyle = s;
+  document.getElementById('styleA').style.display = s === 'A' ? 'flex' : 'none';
+  document.getElementById('styleB').style.display = s === 'B' ? 'block' : 'none';
+  document.getElementById('styleC').style.display = s === 'C' ? 'block' : 'none';
+  document.getElementById('styleD').style.display = s === 'D' ? 'block' : 'none';
+  document.querySelectorAll('#styleTabs .tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('bControls').style.display = s === 'B' ? 'flex' : 'none';
+  document.getElementById('cControls').style.display = (s === 'C' || s === 'D') ? 'flex' : 'none';
+  if (s === 'C' || s === 'D') syncToggleBtns();
+}
+
+// ── 获取当前活动的文字叠加层（C/D 用） ──
+function getActiveOverlay() {
+  return document.getElementById(currentStyle === 'D' ? 'sDOverlay' : 'sCOverlay');
+}
+
+// ── 比例切换 ──
+function switchRatio(r, btn) {
+  document.getElementById('coverOuter').className = `cover-outer r-${r}`;
+  document.querySelectorAll('#ratioTabs .tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+// ── Style B 排版切换 ──
+function switchBLayout(n, btn) {
+  currentBLayout = n;
+  document.querySelectorAll('.sB-layout').forEach(el => el.classList.remove('active'));
+  document.getElementById('sBL' + n).classList.add('active');
+  document.querySelectorAll('#bControls .layout-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+// ── Style B 主题切换 ──
+function setBTheme(theme, el) {
+  const sB = document.getElementById('styleB');
+  sB.className = 'theme-' + theme;
+  document.querySelectorAll('#themeGroup .theme-sw').forEach(s => s.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// ── 图片拖拽平移 + 滚轮缩放 ──
+// mode='cover'：object-position 平移（大图铺满不露底，A/B/D 用）
+// mode 省略  ：transform translate  （人物图可自由移出边界，C 用）
+function makePannable(imgEl, zoneEl, mode) {
+  if (imgEl.dataset.pan) return;
+  imgEl.dataset.pan = '1';
+  imgEl.draggable = false;
+
+  let down = false, wasMoved = false;
+
+  if (mode === 'cover') {
+    // —— cover 模式：object-position 平移，sc≥1 防止露底 ——
+    let px = 50, py = 50, sc = 1;
+    let startX = 0, startY = 0, startPx = 50, startPy = 50;
+
+    function render() {
+      imgEl.style.objectPosition = `${px}% ${py}%`;
+      imgEl.style.transform = sc !== 1 ? `scale(${sc})` : '';
+    }
+    imgEl.addEventListener('mousedown', e => {
+      if (e.button !== 0) return;
+      e.preventDefault(); e.stopPropagation();
+      down = true; wasMoved = false;
+      startX = e.clientX; startY = e.clientY;
+      startPx = px; startPy = py;
+      imgEl.style.cursor = 'grabbing';
+    });
+    document.addEventListener('mousemove', e => {
+      if (!down) return;
+      const zw = zoneEl.offsetWidth || 1;
+      const zh = zoneEl.offsetHeight || 1;
+      px = Math.max(0, Math.min(100, startPx - (e.clientX - startX) / zw * 100));
+      py = Math.max(0, Math.min(100, startPy - (e.clientY - startY) / zh * 100));
+      wasMoved = true; render();
+    });
+    document.addEventListener('mouseup', () => { if (!down) return; down = false; imgEl.style.cursor = 'grab'; });
+    zoneEl.addEventListener('wheel', e => {
+      e.preventDefault();
+      sc = Math.max(1, Math.min(5, sc * (e.deltaY > 0 ? 0.92 : 1.08)));
+      render();
+    }, { passive: false });
+
+  } else {
+    // —— free 模式：transform translate，人物图自由定位 ——
+    imgEl.style.willChange = 'transform';
+    let tx = 0, ty = 0, sc = 1, ox = 0, oy = 0;
+
+    function render() {
+      imgEl.style.transform = `translate(${tx}px, ${ty}px) scale(${sc})`;
+    }
+    imgEl.addEventListener('mousedown', e => {
+      if (e.button !== 0) return;
+      e.preventDefault(); e.stopPropagation();
+      down = true; wasMoved = false;
+      ox = e.clientX - tx; oy = e.clientY - ty;
+      imgEl.style.cursor = 'grabbing';
+    });
+    document.addEventListener('mousemove', e => {
+      if (!down) return;
+      tx = e.clientX - ox; ty = e.clientY - oy;
+      wasMoved = true; render();
+    });
+    document.addEventListener('mouseup', () => { if (!down) return; down = false; imgEl.style.cursor = 'grab'; });
+    zoneEl.addEventListener('wheel', e => {
+      e.preventDefault();
+      sc = Math.max(0.3, Math.min(5, sc * (e.deltaY > 0 ? 0.92 : 1.08)));
+      render();
+    }, { passive: false });
+  }
+
+  // 拖动后阻止 click 触发上传文件框
+  zoneEl.addEventListener('click', e => {
+    if (wasMoved) { e.stopImmediatePropagation(); wasMoved = false; }
+  }, true);
+}
+
+// ── 主图上传（A/B 用） ──
+function handleMainUpload(input) {
+  if (!input.files || !input.files[0]) return;
+  const reader = new FileReader();
+  reader.onload = e => { mainUrl = e.target.result; applyMainImage(mainUrl); };
+  reader.readAsDataURL(input.files[0]);
+}
+function applyMainImage(url) {
+  // Style A — 显示图片并启用 pan/zoom（makePannable 内部会阻止拖动后的 onclick）
+  const imgA = document.getElementById('sAImg');
+  imgA.src = url; imgA.style.display = 'block';
+  document.getElementById('sAPlaceholder').style.display = 'none';
+  makePannable(imgA, document.getElementById('sABanner'), 'cover');
+  // Style B — 4 layouts，各自独立 pan/zoom 状态
+  const bImgCfg = [
+    { imgId: 'sBImg1El', phId: 'sBImg1Ph', zone: document.querySelector('#sBL1 .sBL-img') },
+    { imgId: 'sBImg2El', phId: 'sBImg2Ph', zone: document.querySelector('#sBL2 .sBL-img') },
+    { imgId: 'sBImg3El', phId: 'sBImg3Ph', zone: document.querySelector('#sBL3 .sBL-img') },
+    { imgId: 'sBImg4El', phId: 'sBImg4Ph', zone: document.getElementById('sBImg4Zone') },
+  ];
+  bImgCfg.forEach(({ imgId, phId, zone }) => {
+    const el = document.getElementById(imgId);
+    if (el) { el.src = url; el.style.display = 'block'; if (zone) makePannable(el, zone, 'cover'); }
+    const ph = document.getElementById(phId); if (ph) ph.style.display = 'none';
+  });
+  // Style C：若尚未单独上传背景图，顺带设置为 C 的背景
+  if (!bgUrl) applySCBackground(url);
+}
+
+// ── Style C 背景上传 ──
+function handleBgUpload(input) {
+  if (!input.files || !input.files[0]) return;
+  const reader = new FileReader();
+  reader.onload = e => { bgUrl = e.target.result; applySCBackground(bgUrl); };
+  reader.readAsDataURL(input.files[0]);
+}
+function applySCBackground(url) {
+  const bg     = document.getElementById('sCBg');
+  const bgBlur = document.getElementById('sCBgBlur');
+  bg.style.backgroundImage     = `url('${url}')`;
+  bgBlur.style.backgroundImage = `url('${url}')`;
+  bg.style.display     = 'block';
+  bgBlur.style.display = 'block';
+  // 标记"已有背景图"，切换 aurora 遮罩为暗角模式
+  document.getElementById('styleC').classList.add('has-bg');
+}
+
+// ── 人物照片上传 ──
+function handlePersonUpload(input) {
+  if (!input.files || !input.files[0]) return;
+  const reader = new FileReader();
+  reader.onload = e => { personUrl = e.target.result; applyPersonImage(personUrl); };
+  reader.readAsDataURL(input.files[0]);
+}
+function applyPersonImage(url) {
+  const img = document.getElementById('sCPersonImg');
+  img.src = url; img.style.display = 'block';
+  document.getElementById('sCPersonPh').style.display = 'none';
+  // 不再自动把人物图设为背景，背景由用户单独上传，默认显示 aurora 渐变色
+  makePannable(img, document.getElementById('sCPerson'));
+}
+
+// ── Style D 全图上传 ──
+function handleDImgUpload(input) {
+  if (!input.files || !input.files[0]) return;
+  const reader = new FileReader();
+  reader.onload = e => { applyDImg(e.target.result); };
+  reader.readAsDataURL(input.files[0]);
+}
+function applyDImg(url) {
+  const img = document.getElementById('sDImg');
+  img.src = url; img.style.display = 'block';
+  document.getElementById('sDPlaceholder').style.display = 'none';
+  makePannable(img, document.getElementById('sDImgWrap'), 'cover');
+}
+
+// ── Style C 抠图描边切换 ──
+function toggleCutout() {
+  cutoutOn = !cutoutOn;
+  document.getElementById('sCPerson').classList.toggle('cutout-on', cutoutOn);
+  const btn = document.getElementById('cutoutToggle');
+  btn.textContent = cutoutOn ? '描边 ON' : '描边 OFF';
+  btn.classList.toggle('active', cutoutOn);
+}
+
+// ── Style C 字号缩放 ──
+let scFsScale = 1.0;
+function changeSCFont(delta) {
+  scFsScale = Math.max(0.6, Math.min(1.8, +(scFsScale + delta).toFixed(1)));
+  root.style.setProperty('--sC-fs', scFsScale);
+  document.getElementById('sFsDisplay').textContent = scFsScale.toFixed(1) + '×';
+}
+
+// ── 标题字体切换 ──
+function setTitleFont(fontFamily, el) {
+  root.style.setProperty('--title-font', fontFamily ? `"${fontFamily}", sans-serif` : 'inherit');
+  document.querySelectorAll('.font-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// ── Style C 标题文字颜色 ──
+function setSCTextColor(color, el) {
+  root.style.setProperty('--sC-text-color', color);
+  // 黑色字：描边保持黑色，阴影改为黄色光晕；其余颜色：黑色描边 + 深色阴影
+  if (color === '#111111') {
+    // 黑色字：白色描边，无阴影
+    root.style.setProperty('--sC-stroke-color', '#FFFFFF');
+    root.style.setProperty('--sC-text-shadow', 'none');
+  } else {
+    // 其他颜色：黑色描边 + 硬投影（opacity 100%, blur 0, distance ~4, angle -50°）
+    // angle -50° → x = 4*cos(-50°) ≈ 2px, y = -4*sin(-50°) ≈ 3px
+    root.style.setProperty('--sC-stroke-color', '#111111');
+    root.style.setProperty('--sC-text-shadow', '2px 3px 0px #000000');
+  }
+  document.querySelectorAll('#cTextColors .accent-dot').forEach(d => d.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// ── Style C 副标题颜色 ──
+function setSCSubColor(color, el) {
+  root.style.setProperty('--sC-sub-color', color);
+  document.querySelectorAll('#cSubColors .accent-dot').forEach(d => d.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// ── Style C 拖拽文字模式 ──
+// ── C/D badge & 关键词 显示/隐藏 ──
+function toggleSCElement(type) {
+  const overlay = getActiveOverlay();
+  if (!overlay) return;
+  if (type === 'badge') {
+    const el = overlay.querySelector('.sC-super');
+    if (!el) return;
+    const hidden = el.style.display === 'none';
+    el.style.display = hidden ? '' : 'none';
+    const btn = document.getElementById('toggleBadgeBtn');
+    btn.classList.toggle('active', hidden);
+    btn.textContent = hidden ? '🏷 badge' : '🏷 badge（隐藏）';
+  } else {
+    const el = overlay.querySelector('.sC-middle');
+    if (!el) return;
+    const hidden = el.style.display === 'none';
+    el.style.display = hidden ? '' : 'none';
+    const btn = document.getElementById('toggleKwBtn');
+    btn.classList.toggle('active', hidden);
+    btn.textContent = hidden ? '✅ 关键词' : '✅ 关键词（隐藏）';
+  }
+}
+
+// 切换 C/D 风格时同步按钮状态
+function syncToggleBtns() {
+  const overlay = getActiveOverlay();
+  if (!overlay) return;
+  const badge = overlay.querySelector('.sC-super');
+  const kw    = overlay.querySelector('.sC-middle');
+  const bBtn  = document.getElementById('toggleBadgeBtn');
+  const kBtn  = document.getElementById('toggleKwBtn');
+  const bVis  = !badge || badge.style.display !== 'none';
+  const kVis  = !kw    || kw.style.display    !== 'none';
+  bBtn.classList.toggle('active', bVis);
+  bBtn.textContent = bVis ? '🏷 badge' : '🏷 badge（隐藏）';
+  kBtn.classList.toggle('active', kVis);
+  kBtn.textContent = kVis ? '✅ 关键词' : '✅ 关键词（隐藏）';
+}
+
+function toggleSCDragMode() {
+  scDragMode = !scDragMode;
+  const btn = document.getElementById('dragModeBtn');
+  btn.textContent = scDragMode ? '✓ 拖拽中' : '拖拽文字';
+  btn.classList.toggle('active', scDragMode);
+  if (scDragMode) enableSCDrag(); else disableSCDrag();
+}
+
+function enableSCDrag() {
+  const overlay = getActiveOverlay();
+  const sections = [...overlay.children];
+  const or = overlay.getBoundingClientRect();
+
+  // 快照当前位置（flex 布局下的实际坐标）
+  const snaps = sections.map(el => ({
+    el,
+    x: el.getBoundingClientRect().left - or.left,
+    y: el.getBoundingClientRect().top  - or.top,
+    w: el.offsetWidth,
+  }));
+
+  // 切换为 block 布局（关掉 flex），绝对定位各区块
+  overlay.style.display = 'block';
+  snaps.forEach(({ el, x, y, w }) => {
+    el.style.position   = 'absolute';
+    el.style.left       = x + 'px';
+    el.style.top        = y + 'px';
+    el.style.width      = w + 'px';
+    el.style.pointerEvents = 'auto';
+    el.style.cursor     = 'move';
+
+    if (el.dataset.dragInit) return; // 只绑定一次事件
+    el.dataset.dragInit = '1';
+    let dn = false, ox2 = 0, oy2 = 0;
+
+    el.addEventListener('mousedown', e => {
+      if (!scDragMode) return;
+      if (e.target.closest('[contenteditable]')) return; // 文字编辑优先
+      dn = true; e.preventDefault(); e.stopPropagation();
+      ox2 = e.clientX - parseFloat(el.style.left || 0);
+      oy2 = e.clientY - parseFloat(el.style.top  || 0);
+    });
+    document.addEventListener('mousemove', e => {
+      if (!dn || !scDragMode) return;
+      el.style.left = (e.clientX - ox2) + 'px';
+      el.style.top  = (e.clientY - oy2) + 'px';
+    });
+    document.addEventListener('mouseup', () => { dn = false; });
+  });
+}
+
+function disableSCDrag() {
+  const overlay = getActiveOverlay();
+  [...overlay.children].forEach(el => {
+    el.style.position      = '';
+    el.style.left          = '';
+    el.style.top           = '';
+    el.style.width         = '';
+    el.style.pointerEvents = '';
+    el.style.cursor        = '';
+  });
+  overlay.style.display = '';
+}
+
+// ── 排版4 视差效果 ──
+const stage4   = document.getElementById('sBStage4');
+const img4Zone = document.getElementById('sBImg4Zone');
+stage4.addEventListener('mousemove', e => {
+  const r = stage4.getBoundingClientRect();
+  const x = (e.clientX - r.left) / r.width  - 0.5;
+  const y = (e.clientY - r.top)  / r.height - 0.5;
+  img4Zone.style.transform = `rotateX(${8 - y*18}deg) rotateY(${-12 + x*24}deg) rotateZ(-1deg)`;
+});
+stage4.addEventListener('mouseleave', () => {
+  img4Zone.style.transform = 'rotateX(8deg) rotateY(-12deg) rotateZ(-1deg)';
+});
+
+// ── 拖拽上传（Style A + Style B 所有图片区） ──
+function addImageDropZone(el, onDrop) {
+  el.addEventListener('dragover',  e => { e.preventDefault(); el.style.outline = '2px dashed var(--accent, #E8541A)'; el.style.outlineOffset = '-3px'; });
+  el.addEventListener('dragleave', () => { el.style.outline = ''; el.style.outlineOffset = ''; });
+  el.addEventListener('drop', e => {
+    e.preventDefault(); el.style.outline = ''; el.style.outlineOffset = '';
+    const file = e.dataTransfer.files[0];
+    if (file && file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onload = ev => onDrop(ev.target.result);
+      reader.readAsDataURL(file);
+    }
+  });
+}
+
+// Style A banner
+addImageDropZone(document.getElementById('sABanner'), url => { mainUrl = url; applyMainImage(url); });
+
+// Style B — 4个图片区共享同一张主图
+document.querySelectorAll('#styleB .sBL-img').forEach(zone => {
+  addImageDropZone(zone, url => { mainUrl = url; applyMainImage(url); });
+});
+
+// Style D — 全图背景
+addImageDropZone(document.getElementById('sDImgWrap'), url => { applyDImg(url); });
+
+// ── 导出 PNG（使用 html-to-image，原生支持 CSS blur/gradient/object-fit/transform）──
+async function exportPNG() {
+  const el  = document.getElementById('coverOuter');
+  const btn = document.querySelector('.export-btn');
+  btn.textContent = '生成中...'; btn.disabled = true;
+  document.querySelectorAll('.no-export').forEach(e => e.style.visibility = 'hidden');
+
+  // 拖拽模式：保留文字位置，仅临时隐藏 cursor:move 光标样式
+  const overlay = getActiveOverlay();
+  const dragChildren = scDragMode ? [...overlay.children] : [];
+  const origCursors = dragChildren.map(el => el.style.cursor);
+  dragChildren.forEach(el => { el.style.cursor = 'default'; });
+
+  try {
+    // 修复：无 src 的 <img> 被浏览器解析为页面 URL，html-to-image 会 fetch(pageURL) 触发 CORS
+    // 方案：导出前把所有无 src 的 img 临时设为透明 1px dataURL
+    const imgs = el.querySelectorAll('img');
+    const savedSrcs = [];
+    imgs.forEach(img => {
+      savedSrcs.push(img.getAttribute('src'));
+      if (!img.getAttribute('src')) {
+        img.setAttribute('src', 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7');
+      }
+    });
+
+    let dataUrl;
+    try {
+      dataUrl = await htmlToImage.toPng(el, {
+        pixelRatio: 3,
+        // imagePlaceholder 兜底：任何图片 fetch 失败（CORS/404）用透明 1px 代替，不抛错
+        imagePlaceholder: 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7',
+      });
+    } finally {
+      // 无论成败，还原 img src
+      imgs.forEach((img, i) => {
+        const orig = savedSrcs[i];
+        if (orig === null) img.removeAttribute('src');
+        else img.setAttribute('src', orig);
+      });
+    }
+
+    const a = document.createElement('a');
+    const labels = { A: '干货图文', B: '图文卡片', C: '人物出镜', D: '全图出镜' };
+    a.download = `xhs-封面-${labels[currentStyle]}.png`;
+    a.href = dataUrl; a.click();
+  } catch(e) {
+    console.error('Export error:', e);
+    alert('导出失败：' + (e && (e.message || e.toString()) || '未知错误'));
+  }
+  finally {
+    dragChildren.forEach((el, i) => { el.style.cursor = origCursors[i]; });
+    btn.textContent = '导出封面 PNG'; btn.disabled = false;
+    document.querySelectorAll('.no-export').forEach(e => e.style.visibility = '');
+  }
+}
+</script>
+</body>
+</html>
